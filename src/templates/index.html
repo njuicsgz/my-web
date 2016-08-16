@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+</head>
+
+<body>
+<h2>name: {{ app_info.name }} <br>
+ID: {{ app_info.ID }} <br>
+version: {{ app_info.version }} <br>
+status: {{ app_info.status }}
+{% if app_info.status == 'starting' %}
+(启动剩余时间 {{app_info.start_left_time}} 秒)
+{% endif %}
+<br>
+</h1>
+
+{% if app_info.status == 'running' %}
+<form method="post" action="{{ url_for('stop') }}">
+    <p><button type="submit">Stop</button></p>
+</form>
+<form method="post" action="{{ url_for('kill') }}">
+    <p><button type="submit">Kill</button></p>
+</form>
+{% endif %}
+
+{% if app_info.status == 'stopped' %}
+<form method="post" action="{{ url_for('start') }}">
+    <p><button type="submit">Start</button></p>
+</form>
+<form method="post" action="{{ url_for('kill') }}">
+    <p><button type="submit">Kill</button></p>
+</form>
+{% endif %}
+
+</body>
+</html>
+
