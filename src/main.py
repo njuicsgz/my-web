@@ -10,7 +10,7 @@ import uuid
 class AppInfo:
     def __init__(self):
         self.name = 'my-app'
-        self.version = 0.1
+        self.version = 0.2
         self.ID = uuid.uuid1().get_hex()
         self.is_ready = False
         self.status = 'stopped'
