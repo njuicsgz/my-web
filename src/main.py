@@ -10,38 +10,31 @@ import uuid
 def patch_broken_pipe_error():
     """Monkey Patch BaseServer.handle_error to not write
     a stacktrace to stderr on broken pipe.
-    http://stackoverflow.com/a/22618740/362702"""
+    http://stackoverflow.com/a/7913160"""
+    import sys
     from SocketServer import BaseServer
-    from wsgiref import handlers
 
-    print "setup broken pipe error patch"
     handle_error = BaseServer.handle_error
-    log_exception = handlers.BaseHandler.log_exception
-
-    def is_broken_pipe_error():
-        type, err, tb = sys.exc_info()
-        print "got socket server error: %s" % repr(err)
-        return repr(err) == "error(32, 'Broken pipe')"
 
     def my_handle_error(self, request, client_address):
-        if not is_broken_pipe_error():
-            handle_error(self, request, client_address)
+        type, err, tb = sys.exc_info()
+        # there might be better ways to detect the specific erro
+	print "got error: %s" % repr(err)
+        if repr(err) == "error(32, 'Broken pipe')":
+            # you may ignore it...
+	    print "got pipe broken error"
         else:
-            print "got and ignore broken pipe error"
-
-    def my_log_exception(self, exc_info):
-        if not is_broken_pipe_error():
-            log_exception(self, exc_info)
+            handle_error(self, request, client_address)
 
     BaseServer.handle_error = my_handle_error
-    handlers.BaseHandler.log_exception = my_log_exception
+
 
 patch_broken_pipe_error()
 
 class AppInfo:
     def __init__(self):
         self.name = 'my-app'
-        self.version = 1.3
+        self.version = 1.4
         self.ID = uuid.uuid1().get_hex()
         self.is_ready = False
         self.status = 'stopped'
