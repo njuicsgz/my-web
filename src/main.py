@@ -120,5 +120,5 @@ if len(sys.argv) != 3:
     usage()
     sys.exit(1)
 
-app.run(host=sys.argv[1], port=int(sys.argv[2]), debug=False, use_reloader=False)
+app.run(host=sys.argv[1], port=int(sys.argv[2]), debug=False, use_reloader=False, threaded=True)
 
