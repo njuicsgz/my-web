@@ -14,16 +14,20 @@ def patch_broken_pipe_error():
     from SocketServer import BaseServer
     from wsgiref import handlers
 
+    print "setup broken pipe error patch"
     handle_error = BaseServer.handle_error
     log_exception = handlers.BaseHandler.log_exception
 
     def is_broken_pipe_error():
         type, err, tb = sys.exc_info()
+        print "got socket server error: %s" % repr(err)
         return repr(err) == "error(32, 'Broken pipe')"
 
     def my_handle_error(self, request, client_address):
         if not is_broken_pipe_error():
             handle_error(self, request, client_address)
+        else:
+            print "got and ignore broken pipe error"
 
     def my_log_exception(self, exc_info):
         if not is_broken_pipe_error():
@@ -37,7 +41,7 @@ patch_broken_pipe_error()
 class AppInfo:
     def __init__(self):
         self.name = 'my-app'
-        self.version = 0.2
+        self.version = 1.3
         self.ID = uuid.uuid1().get_hex()
         self.is_ready = False
         self.status = 'stopped'
@@ -46,12 +50,12 @@ class AppInfo:
         while True:
             now = time.time()
             if self.status == 'starting':
-                if now - self.start_time >= 30:
+                if now - self.start_time >= 5:
                     self.status = 'running'
                     self.is_ready = True
                     self.start_left_time = 0
                 else:
-                    self.start_left_time = int(30 - (now - self.start_time))
+                    self.start_left_time = int(5 - (now - self.start_time))
             yield
 
     def stop(self):
@@ -63,7 +67,7 @@ class AppInfo:
         self.status = 'starting'
         self.is_ready = False
         self.start_time = time.time()
-        self.start_left_time = 30
+        self.start_left_time = 5
 
 def shutdown_server():
     func = request.environ.get('werkzeug.server.shutdown')
