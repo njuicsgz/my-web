@@ -7,34 +7,11 @@ import flask
 import json
 import uuid
 
-def patch_broken_pipe_error():
-    """Monkey Patch BaseServer.handle_error to not write
-    a stacktrace to stderr on broken pipe.
-    http://stackoverflow.com/a/7913160"""
-    import sys
-    from SocketServer import BaseServer
-
-    handle_error = BaseServer.handle_error
-
-    def my_handle_error(self, request, client_address):
-        type, err, tb = sys.exc_info()
-        # there might be better ways to detect the specific erro
-	print "got error: %s" % repr(err)
-        if repr(err) == "error(32, 'Broken pipe')":
-            # you may ignore it...
-	    print "got pipe broken error"
-        else:
-            handle_error(self, request, client_address)
-
-    BaseServer.handle_error = my_handle_error
-
-
-patch_broken_pipe_error()
 
 class AppInfo:
     def __init__(self):
         self.name = 'my-app'
-        self.version = 1.4
+        self.version = 1.5
         self.ID = uuid.uuid1().get_hex()
         self.is_ready = False
         self.status = 'stopped'
